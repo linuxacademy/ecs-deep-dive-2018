@@ -6,6 +6,10 @@ Build the container image:
 
 `make build`
 
+Run the container image:
+
+`make run`
+
 Inspect the labels by iterating through them, and printing them each in a new line:
 
 `make inspect`

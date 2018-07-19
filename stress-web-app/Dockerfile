@@ -1,9 +1,5 @@
 # This is a multi-stage build.
 
-# Usage:
-# docker build -t linuxacademy/stress-web-app .
-# docker run --rm linuxacademy/stress-web-app -p 8080:8080
-
 # build stage
 FROM golang:1.10 AS builder
 WORKDIR /go/src/github.com/linuxacademy/stress-web-app
@@ -35,7 +31,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vendor=$VENDOR \
       org.label-schema.version=$VERSION \
       org.label-schema.docker.schema-version="1.0" \
-      org.label-schema.docker.cmd="docker run -d linuxacademy/stress-web-app"
+      org.label-schema.docker.cmd="docker run --rm -p 8080:8080 linuxacademy/stress-web-app"
 
 CMD ["./app"]
 EXPOSE 8080
