@@ -5,9 +5,10 @@ BUILD_DATE := $(shell date -R)
 VCS_URL := $(shell basename `git rev-parse --show-toplevel`)
 VCS_REF := $(shell git log -1 --pretty=%h)
 NAME := $(shell basename `git rev-parse --show-toplevel`)
+DOCKER ?= $(shell which docker)
 
 build:
-	docker build -t ${IMAGE} --build-arg VERSION="${VERSION}" \
+	docker build --rm -t ${IMAGE} --build-arg VERSION="${VERSION}" \
 	--build-arg BUILD_DATE="${BUILD_DATE}" \
 	--build-arg VCS_URL="${VCS_URL}" \
 	--build-arg VCS_REF="${VCS_REF}" \
@@ -15,13 +16,16 @@ build:
 	--build-arg VENDOR="${VENDOR}" .
 
 run:
-	docker run --rm -p 8080:8080 ${IMAGE}
+	@$(DOCKER) run --rm -p 8080:8080 ${IMAGE}
 
 clean:
-	docker rmi ${IMAGE}
+	@$(DOCKER) images -q -f "dangling=true" | \
+		xargs -I {} $(DOCKER) rmi {}
+	@$(DOCKER) volume ls -q -f "dangling=true" | \
+		xargs -I {} $(DOCKER) volume rm {}
 
 inspect:
-	docker inspect --format='{{range $$k, $$v := .Config.Labels}}{{$$k}}={{$$v}}{{println}}{{end}}' ${IMAGE}
+	@$(DOCKER) inspect --format='{{range $$k, $$v := .Config.Labels}}{{$$k}}={{$$v}}{{println}}{{end}}' ${IMAGE}
 
 print:
 	@echo VERSION=${VERSION}
