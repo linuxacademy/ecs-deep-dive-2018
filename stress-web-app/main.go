@@ -10,10 +10,11 @@ import (
 )
 
 func main() {
-	fmt.Println("Listening on :8080")
+	fmt.Println("Listening on :80")
 	r := mux.NewRouter()
 	r.HandleFunc("/", handler).Methods("GET")
-	http.ListenAndServe(":8080", r)
+	r.HandleFunc("/health", healthHandler).Methods("GET")
+	http.ListenAndServe(":80", r)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -42,4 +43,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("End CPU stress.")
+}
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("OK")
+	w.WriteHeader(http.StatusOK)
 }

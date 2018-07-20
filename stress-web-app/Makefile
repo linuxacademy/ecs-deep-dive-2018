@@ -15,7 +15,7 @@ build:
 	--build-arg VENDOR="${VENDOR}" .
 
 run:
-	docker run --rm -p 8080:8080 ${IMAGE}
+	docker run --rm -p 8080:80 ${IMAGE}
 
 tag:
 	docker tag stress-web-app:latest ${ECR_REPO}:latest
@@ -25,9 +25,9 @@ push:
 
 clean:
 	docker images -q -f "dangling=true" | \
-		xargs -I {} $(DOCKER) rmi {}
+		xargs -I {} docker rmi {}
 	docker volume ls -q -f "dangling=true" | \
-		xargs -I {} $(DOCKER) volume rm {}
+		xargs -I {} docker volume rm {}
 
 inspect:
 	docker inspect --format='{{range $$k, $$v := .Config.Labels}}{{$$k}}={{$$v}}{{println}}{{end}}' ${IMAGE}
