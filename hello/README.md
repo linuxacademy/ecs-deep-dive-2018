@@ -17,7 +17,7 @@ Inspect the labels by iterating through them, and printing them each in a new li
 
 Set the `ECR_REPO` environment variable to your ECR Repository URI. For example:
 
-`export ECR_REPO=123456789012.dkr.ecr.us-east-1.amazonaws.com/stress-web-app`
+`export ECR_REPO=123456789012.dkr.ecr.us-east-1.amazonaws.com/hello`
 
 After the build completes, tag your image so you can push the image to this repository:
 
