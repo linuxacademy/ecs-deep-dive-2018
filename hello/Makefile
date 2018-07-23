@@ -7,7 +7,7 @@ VCS_REF := $(shell git log -1 --pretty=%h)
 NAME := $(shell basename `git rev-parse --show-toplevel`)
 
 build:
-	docker build --rm -t ${IMAGE} --build-arg VERSION="${VERSION}" \
+	docker build --rm -t ${VENDOR}/${IMAGE} --build-arg VERSION="${VERSION}" \
 	--build-arg BUILD_DATE="${BUILD_DATE}" \
 	--build-arg VCS_URL="${VCS_URL}" \
 	--build-arg VCS_REF="${VCS_REF}" \
@@ -15,10 +15,10 @@ build:
 	--build-arg VENDOR="${VENDOR}" .
 
 run:
-	docker run --rm -p 8080:80 ${IMAGE}
+	docker run --rm -p 8080:80 ${VENDOR}/${IMAGE}
 
 tag:
-	docker tag hello:latest ${ECR_REPO}:latest
+	docker tag ${VENDOR}/${IMAGE}:latest ${ECR_REPO}:latest
 
 push:
 	docker push ${ECR_REPO}:latest
