@@ -7,3 +7,5 @@ This repo contains course material organized as follows:
 `/hello`: A simple containerized web application
 
 `/stress-web-app`: A web application to stress the CPU, useful for demonstrating autoscaling
+
+`/task-definitions`: Various task definitions used throughout the course.
