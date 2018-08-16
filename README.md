@@ -9,3 +9,5 @@ This repo contains course material organized as follows:
 `/stress-web-app`: A web application to stress the CPU, useful for demonstrating autoscaling
 
 `/task-definitions`: Various task definitions used throughout the course.
+
+`/scheduled-task`: Dummy scheduled task intended to demonstrate running an ECS task on a `cron`-like schedule.
