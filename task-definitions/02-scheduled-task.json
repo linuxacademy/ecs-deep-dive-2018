@@ -1,0 +1,39 @@
+{
+  "requiresCompatibilities": [
+      "FARGATE"
+  ],
+  "containerDefinitions": [
+      {
+          "name": "scheduled-task",
+          "image": "your_aws_account_id.dkr.ecr.us-east-1.amazonaws.com/scheduled-task:latest",
+          "essential": true,
+          "portMappings": [],
+          "environment": null,
+          "mountPoints": null,
+          "volumesFrom": null,
+          "hostname": null,
+          "user": null,
+          "workingDirectory": null,
+          "extraHosts": null,
+          "logConfiguration": {
+              "logDriver": "awslogs",
+              "options": {
+                  "awslogs-group": "/ecs/scheduled-task",
+                  "awslogs-region": "us-east-1",
+                  "awslogs-stream-prefix": "ecs"
+              }
+          },
+          "ulimits": null,
+          "dockerLabels": null,
+          "repositoryCredentials": {
+              "credentialsParameter": ""
+          }
+      }
+  ],
+  "volumes": [],
+  "networkMode": "awsvpc",
+  "memory": "512",
+  "cpu": "256",
+  "executionRoleArn": "arn:aws:iam::your_aws_account_id:role/ecsTaskExecutionRole",
+  "family": "scheduled-task"
+}
