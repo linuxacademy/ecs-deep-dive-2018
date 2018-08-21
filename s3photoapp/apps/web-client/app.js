@@ -27,10 +27,10 @@ const dynamodb = new DynamoDB({ region: process.env.AWS_REGION || 'us-east-1' })
 debugAppVars('PROCESS.ENV: ', process.env);
 
 const filterHost =
-  process.env.FILTER_HOST || process.env.DOCKER_COMPOSE ? 'photo-filter' : 'localhost';
+  process.env.FILTER_HOST || (process.env.DOCKER_COMPOSE ? 'photo-filter' : 'localhost');
 const filterPort = process.env.FILTER_PORT || '3002';
 const storageHost =
-  process.env.STORAGE_HOST || process.env.DOCKER_COMPOSE ? 'photo-storage' : 'localhost';
+  process.env.STORAGE_HOST || (process.env.DOCKER_COMPOSE ? 'photo-storage' : 'localhost');
 const storagePort = process.env.STORAGE_PORT || '3001';
 
 debugAppVars('EXTERNAL HOSTS/PORTS: ', {
