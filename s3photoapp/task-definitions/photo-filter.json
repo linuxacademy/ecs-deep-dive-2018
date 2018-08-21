@@ -1,0 +1,47 @@
+{
+  "family": "s3photoapp-photo-filter",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "s3photoapp-photo-filter",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/s3photoapp-photo-filter:latest",
+      "memoryReservation": "300",
+      "cpu": "256",
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": "3002",
+          "containerPort": "3002",
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/s3photoapp-photo-filter",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "command": [
+    "npm",
+    "run",
+    "prod"
+  ],
+  "memory": "512",
+  "cpu": "256",
+  "environment": [
+    {
+      "name": "DEBUG",
+      "value": "*"
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "volumes": [],
+  "placementConstraints": []
+}

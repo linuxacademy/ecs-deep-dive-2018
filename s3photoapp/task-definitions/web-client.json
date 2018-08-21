@@ -1,0 +1,56 @@
+{
+  "family": "s3photoapp-web-client",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "s3photoapp-web-client",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/s3photoapp-web-client:latest",
+      "memoryReservation": "300",
+      "cpu": "256",
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": "3000",
+          "containerPort": "3000",
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/s3photoapp-web-client",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "memory": "512",
+  "cpu": "256",
+  "command": [
+    "npm",
+    "run",
+    "prod"
+  ],
+  "environment": [
+    {
+      "name": "FILTER_HOST",
+      "value": "s3photoapp-photo-filter-service.local"
+    },
+    {
+      "name": "STORAGE_HOST",
+      "value": "s3photoapp-photo-storage-service.local"
+    },
+    {
+      "name": "DEBUG",
+      "value": "*"
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/s3photoapp-web-client",
+  "volumes": [],
+  "placementConstraints": []
+}

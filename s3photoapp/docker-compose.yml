@@ -4,7 +4,7 @@ services:
     build:
       context: ./apps/web-client
       dockerfile: Dockerfile
-    image: s3-photos/web-client:prod
+    image: s3photoapp-web-client:latest
     ports:
       - "3000:3000"
     links:
@@ -27,7 +27,7 @@ services:
     build:
       context: ./apps/photo-filter
       dockerfile: Dockerfile
-    image: s3-photos/photo-filter:prod
+    image: s3photoapp-photo-filter:latest
     ports:
       - "3002:3002"
     entrypoint: npm run prod
@@ -38,7 +38,7 @@ services:
     build:
       context: ./apps/photo-storage
       dockerfile: Dockerfile
-    image: s3-photos/photo-storage:prod
+    image: s3photoapp-photo-storage:latest
     ports:
       - "3001:3001"
     entrypoint: npm run prod
