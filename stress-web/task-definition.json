@@ -1,0 +1,27 @@
+{
+  "family": "stress-web",
+  "containerDefinitions": [
+    {
+      "name": "stress-web",
+      "image": "000000000000.dkr.ecr.us-east-1.amazonaws.com/stress-web:latest",
+      "memoryReservation": "300",
+      "cpu": "256",
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": "0",
+          "containerPort": "80",
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/stress-web",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
