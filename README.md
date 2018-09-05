@@ -6,7 +6,7 @@ This repo contains course material organized as follows:
 
 `/hello`: A simple containerized web application
 
-`/s3photoapp`: A multi-project repo of services that work together to form a demo to enable users to get and upload photos to Amazon S3
+`/picture-upload`: A multi-project repo of services that work together to form a demo to enable users to get and upload photos to Amazon S3
 
 `/scheduled-task`: Dummy scheduled task intended to demonstrate running an ECS task on a `cron`-like schedule.
 
