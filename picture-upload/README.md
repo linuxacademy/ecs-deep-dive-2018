@@ -14,7 +14,7 @@ This project is composed of independent Node.js services:
 ## Development Installation
 
 1. Clone the repository into your local machine
-1. Go into the new folder `s3photoapp` folder and run `make install` to install all the packages for each app.
+1. Go into the new folder `picture-upload` folder and run `make install` to install all the packages for each app.
 
 ## Development Deployment
 
@@ -22,7 +22,7 @@ This project is composed of independent Node.js services:
 
 1. Install via `Development Installation` instructions
 1. Ensure that you have completed AWS CLI configuration on your host machine (see: [Configuring the AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html))
-1. Go into each folder in `s3photoapp/apps` and run `npm run dev`
+1. Go into each folder in `picture-upload/apps` and run `npm run dev`
 
 ### Verifying Deployment
 
