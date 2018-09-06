@@ -288,49 +288,6 @@ Resources:
             RouteTableId: !Ref PrivateRouteTable2
             SubnetId: !Ref PrivateSubnet2
 
-    ###########################################################################
-    # Bastion Host
-    ###########################################################################
-
-    BastionSecurityGroup:
-        Type: "AWS::EC2::SecurityGroup"
-        Properties:
-            GroupDescription: "BastionSG"
-            VpcId: !Ref VPC
-            Tags:
-                - Key: Name
-                  Value: BastionSG
-            SecurityGroupIngress:
-                - CidrIp: "0.0.0.0/0"
-                  FromPort: 22
-                  IpProtocol: "tcp"
-                  ToPort: 22
-
-    BastionInstance:
-        Type: AWS::EC2::Instance
-        Properties:
-            ImageId: '%ami-43%' # ami-14c5486b
-            InstanceType: t2.micro
-            Tags:
-                - Key: Application
-                  Value: !Ref EnvironmentName
-                - Key: Name
-                  Value: 'bastion'
-            NetworkInterfaces:
-                -  AssociatePublicIpAddress: true
-                   DeviceIndex: '0'
-                   DeleteOnTermination: true
-                   SubnetId: !Ref PublicSubnet1
-                   GroupSet:
-                    - !Ref BastionSecurityGroup
-            UserData:
-                Fn::Base64: !Sub |
-                    #!/bin/bash
-                    /bin/echo '%password%' | /bin/passwd cloud_user --stdin
-                    yum update -y
-                    mkdir /home/cloud_user/.aws
-                    echo -e '[default]\nregion = us-east-1' > /home/cloud_user/.aws/config
-
     #############################################################################
     # Security Group
     #############################################################################
@@ -688,10 +645,6 @@ Resources:
           - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
 
 Outputs:
-
-    pubIpAddress1:
-        Description: Bastion Host IP
-        Value: !GetAtt BastionInstance.PublicIp
 
     VPC:
         Description: A reference to the created VPC
