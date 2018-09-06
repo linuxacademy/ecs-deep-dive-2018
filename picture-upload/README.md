@@ -76,7 +76,3 @@ This project is composed of independent Node.js services:
 - `AWS_REGION`:
   - Default: "us-east-1"
   - Description: The region to send AWS S3 Requests to
-
-## Creating the ECS Service
-
-`aws ecs create-service --cli-input-json file://service.json`

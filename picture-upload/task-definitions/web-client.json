@@ -1,13 +1,13 @@
 {
-  "family": "s3photoapp-web-client",
+  "family": "web-client",
   "requiresCompatibilities": [
     "FARGATE"
   ],
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "s3photoapp-web-client",
-      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/s3photoapp-web-client:latest",
+      "name": "web-client",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/web-client:latest",
       "memoryReservation": "300",
       "cpu": "256",
       "essential": true,
@@ -21,7 +21,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/s3photoapp-web-client",
+          "awslogs-group": "/ecs/web-client",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }

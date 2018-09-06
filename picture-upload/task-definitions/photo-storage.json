@@ -1,13 +1,13 @@
 {
-  "family": "s3photoapp-photo-storage",
+  "family": "photo-storage",
   "requiresCompatibilities": [
     "FARGATE"
   ],
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "s3photoapp-photo-storage",
-      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/s3photoapp-photo-storage:latest",
+      "name": "photo-storage",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/photo-storage:latest",
       "memoryReservation": "300",
       "cpu": "256",
       "essential": true,
@@ -21,7 +21,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/s3photoapp-photo-storage",
+          "awslogs-group": "/ecs/photo-storage",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }

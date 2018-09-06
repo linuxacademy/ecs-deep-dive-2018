@@ -1,13 +1,13 @@
 {
-  "family": "s3photoapp-photo-filter",
+  "family": "photo-filter",
   "requiresCompatibilities": [
     "FARGATE"
   ],
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "s3photoapp-photo-filter",
-      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/s3photoapp-photo-filter:latest",
+      "name": "photo-filter",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/photo-filter:latest",
       "memoryReservation": "300",
       "cpu": "256",
       "essential": true,
@@ -21,7 +21,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/s3photoapp-photo-filter",
+          "awslogs-group": "/ecs/photo-filter",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }

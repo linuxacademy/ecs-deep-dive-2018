@@ -1,0 +1,762 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: >
+
+  This template creates a complete ECS Cluster with the following resources:
+
+  - A tiered VPC with public and private subnets.
+  - A highly available ECS cluster deployed across two Availability Zones in an
+    Auto Scaling group and that are AWS SSM enabled.
+  - A pair of NAT gateways (one in each zone) to handle outbound traffic.
+  - Application Load Balancer
+  - IAM Service Roles
+
+#   This template deploys a VPC, with a pair of public and private subnets spread
+#   across two Availability Zones. It deploys an Internet Gateway, with a default
+#   route on the public subnets. It deploys a pair of NAT Gateways (one in each
+#   AZ), and default routes for them in the private subnets. It also deploys an
+#   ALB with a default target group.
+
+#   It then deploys a highly available ECS cluster using an AutoScaling Group,
+#   with ECS hosts distributed across multiple Availability Zones.
+
+Parameters:
+
+    EnvironmentName:
+        Description: An environment name that will be prefixed to resource names
+        Type: String
+        Default: Lab
+
+    VpcCIDR:
+        Description: Please enter the IP range (CIDR notation) for this VPC
+        Type: String
+        AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+        Default: 10.192.0.0/16
+
+    PublicSubnet1CIDR:
+        Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+        Type: String
+        AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+        Default: 10.192.10.0/24
+
+    PublicSubnet2CIDR:
+        Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+        Type: String
+        AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+        Default: 10.192.11.0/24
+
+    PrivateSubnet1CIDR:
+        Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+        Type: String
+        AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+        Default: 10.192.20.0/24
+
+    PrivateSubnet2CIDR:
+        Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+        Type: String
+        AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+        Default: 10.192.21.0/24
+
+    InstanceType:
+        Type: String
+        Default: t2.micro
+        AllowedValues:
+            - t2.micro
+            - m1.small
+            - m1.large
+
+    ClusterSize:
+        Type: Number
+        Default: 4
+        AllowedValues:
+            - 1
+            - 2
+            - 3
+            - 4
+
+Mappings:
+
+  # These are the latest ECS optimized AMIs as of August 2018:
+  #
+  #   amzn-ami-2018.03.e-amazon-ecs-optimized
+  #   ECS agent:    1.20.1
+  #   Docker:       18.03.1-ce
+  #   ecs-init:     1.20.1-1
+  #
+  # You can find the latest available on this page of our documentation:
+  # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
+  # (note the AMI identifier is region specific)
+
+  AWSRegionToAMI:
+    us-east-1:
+      AMI: ami-00129b193dc81bc31
+    us-east-2:
+      AMI: ami-028a9de0a7e353ed9
+    us-west-2:
+      AMI: ami-00d4f478
+    us-west-1:
+      AMI: ami-0d438d09af26c9583
+    eu-west-3:
+      AMI: ami-07da674f0655ef4e1
+    eu-west-2:
+      AMI: ami-a44db8c3
+    eu-west-1:
+      AMI: ami-0af844a965e5738db
+    eu-central-1:
+      AMI: ami-0291ba887ba0d515f
+    ap-northeast-2:
+      AMI: ami-047d2a61f94f862dc
+    ap-northeast-1:
+      AMI: ami-0041c416aa23033a2
+    ap-southeast-2:
+      AMI: ami-0092e55c70015d8c3
+    ap-southeast-1:
+      AMI: ami-091bf462afdb02c60
+    ca-central-1:
+      AMI: ami-192fa27d
+    ap-south-1:
+      AMI: ami-0c179ca015d301829
+    sa-east-1:
+      AMI: ami-0018ff8ee48970ac3
+    us-gov-west-1:
+      AMI: ami-c6079ba7
+
+Resources:
+
+    #############################################################################
+    # VPC
+    #############################################################################
+
+    VPC:
+        Type: AWS::EC2::VPC
+        Properties:
+            CidrBlock: !Ref VpcCIDR
+            EnableDnsHostnames: true
+            Tags:
+                - Key: Name
+                  Value: !Ref EnvironmentName
+
+    InternetGateway:
+        Type: AWS::EC2::InternetGateway
+        Properties:
+            Tags:
+                - Key: Name
+                  Value: !Ref EnvironmentName
+
+    InternetGatewayAttachment:
+        Type: AWS::EC2::VPCGatewayAttachment
+        Properties:
+            InternetGatewayId: !Ref InternetGateway
+            VpcId: !Ref VPC
+
+    PublicSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref VPC
+            AvailabilityZone: !Select [ 0, !GetAZs '' ]
+            CidrBlock: !Ref PublicSubnet1CIDR
+            MapPublicIpOnLaunch: true
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+
+    PublicSubnet2:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref VPC
+            AvailabilityZone: !Select [ 1, !GetAZs '' ]
+            CidrBlock: !Ref PublicSubnet2CIDR
+            MapPublicIpOnLaunch: true
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
+
+    PrivateSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref VPC
+            AvailabilityZone: !Select [ 0, !GetAZs '' ]
+            CidrBlock: !Ref PrivateSubnet1CIDR
+            MapPublicIpOnLaunch: false
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+
+    PrivateSubnet2:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref VPC
+            AvailabilityZone: !Select [ 1, !GetAZs '' ]
+            CidrBlock: !Ref PrivateSubnet2CIDR
+            MapPublicIpOnLaunch: false
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
+
+    NatGateway1EIP:
+        Type: AWS::EC2::EIP
+        DependsOn: InternetGatewayAttachment
+        Properties:
+            Domain: vpc
+
+    NatGateway2EIP:
+        Type: AWS::EC2::EIP
+        DependsOn: InternetGatewayAttachment
+        Properties:
+            Domain: vpc
+
+    NatGateway1:
+        Type: AWS::EC2::NatGateway
+        Properties:
+            AllocationId: !GetAtt NatGateway1EIP.AllocationId
+            SubnetId: !Ref PublicSubnet1
+
+    NatGateway2:
+        Type: AWS::EC2::NatGateway
+        Properties:
+            AllocationId: !GetAtt NatGateway2EIP.AllocationId
+            SubnetId: !Ref PublicSubnet2
+
+    PublicRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref VPC
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Public Routes
+
+    DefaultPublicRoute:
+        Type: AWS::EC2::Route
+        DependsOn: InternetGatewayAttachment
+        Properties:
+            RouteTableId: !Ref PublicRouteTable
+            DestinationCidrBlock: 0.0.0.0/0
+            GatewayId: !Ref InternetGateway
+
+    PublicSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref PublicRouteTable
+            SubnetId: !Ref PublicSubnet1
+
+    PublicSubnet2RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref PublicRouteTable
+            SubnetId: !Ref PublicSubnet2
+
+
+    PrivateRouteTable1:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref VPC
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Private Routes (AZ1)
+
+    DefaultPrivateRoute1:
+        Type: AWS::EC2::Route
+        Properties:
+            RouteTableId: !Ref PrivateRouteTable1
+            DestinationCidrBlock: 0.0.0.0/0
+            NatGatewayId: !Ref NatGateway1
+
+    PrivateSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref PrivateRouteTable1
+            SubnetId: !Ref PrivateSubnet1
+
+    PrivateRouteTable2:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref VPC
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Private Routes (AZ2)
+
+    DefaultPrivateRoute2:
+        Type: AWS::EC2::Route
+        Properties:
+            RouteTableId: !Ref PrivateRouteTable2
+            DestinationCidrBlock: 0.0.0.0/0
+            NatGatewayId: !Ref NatGateway2
+
+    PrivateSubnet2RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref PrivateRouteTable2
+            SubnetId: !Ref PrivateSubnet2
+
+    ###########################################################################
+    # Bastion Host
+    ###########################################################################
+
+    BastionSecurityGroup:
+        Type: "AWS::EC2::SecurityGroup"
+        Properties:
+            GroupDescription: "BastionSG"
+            VpcId: !Ref VPC
+            Tags:
+                - Key: Name
+                  Value: BastionSG
+            SecurityGroupIngress:
+                - CidrIp: "0.0.0.0/0"
+                  FromPort: 22
+                  IpProtocol: "tcp"
+                  ToPort: 22
+
+    BastionInstance:
+        Type: AWS::EC2::Instance
+        Properties:
+            ImageId: '%ami-43%' # ami-14c5486b
+            InstanceType: t2.micro
+            Tags:
+                - Key: Application
+                  Value: !Ref EnvironmentName
+                - Key: Name
+                  Value: 'bastion'
+            NetworkInterfaces:
+                -  AssociatePublicIpAddress: true
+                   DeviceIndex: '0'
+                   DeleteOnTermination: true
+                   SubnetId: !Ref PublicSubnet1
+                   GroupSet:
+                    - !Ref BastionSecurityGroup
+            UserData:
+                Fn::Base64: !Sub |
+                    #!/bin/bash
+                    /bin/echo '%password%' | /bin/passwd cloud_user --stdin
+                    yum update -y
+                    mkdir /home/cloud_user/.aws
+                    echo -e '[default]\nregion = us-east-1' > /home/cloud_user/.aws/config
+
+    #############################################################################
+    # Security Group
+    #############################################################################
+
+    # This security group defines who/where is allowed to access the ECS hosts directly.
+    # By default we're just allowing access from the load balancer.  If you want to SSH
+    # into the hosts, or expose non-load balanced services you can open their ports here.
+    ECSHostSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            VpcId: !Ref VPC
+            GroupDescription: Access to the ECS hosts and the tasks/containers that run on them
+            SecurityGroupIngress:
+                # Only allow inbound access to ECS from the ELB
+                - SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+                  IpProtocol: '-1'
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName}-ECS-Hosts
+
+    # This security group defines who/where is allowed to access the Application Load Balancer.
+    # By default, we've opened this up to the public internet (0.0.0.0/0) but can you restrict
+    # it further if you want.
+    LoadBalancerSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            VpcId: !Ref VPC
+            GroupDescription: Access to the load balancer that sits in front of ECS
+            SecurityGroupIngress:
+                # Allow access from anywhere to our ECS services
+                - CidrIp: 0.0.0.0/0
+                  IpProtocol: '-1'
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName}-LoadBalancers
+
+    #############################################################################
+    # Load Balancer
+    #############################################################################
+
+    LoadBalancer:
+        Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+        Properties:
+            Name: !Ref EnvironmentName
+            Subnets: [!Ref PublicSubnet1, !Ref PublicSubnet2]
+            SecurityGroups:
+                - !Ref LoadBalancerSecurityGroup
+            Tags:
+                - Key: Name
+                  Value: !Ref EnvironmentName
+
+    LoadBalancerListener:
+        Type: AWS::ElasticLoadBalancingV2::Listener
+        Properties:
+            LoadBalancerArn: !Ref LoadBalancer
+            Port: 80
+            Protocol: HTTP
+            DefaultActions:
+                - Type: forward
+                  TargetGroupArn: !Ref DefaultTargetGroup
+
+    # We define a default target group here, as this is a mandatory Parameters
+    # when creating an Application Load Balancer Listener. This is not used, instead
+    # a target group is created per-service in each service template (../services/*)
+    DefaultTargetGroup:
+        Type: AWS::ElasticLoadBalancingV2::TargetGroup
+        Properties:
+            Name: !Sub ${EnvironmentName}-default
+            VpcId: !Ref VPC
+            Port: 80
+            Protocol: HTTP
+
+    #############################################################################
+    # ECS Cluster
+    #############################################################################
+
+    ECSCluster:
+        Type: AWS::ECS::Cluster
+        Properties:
+            ClusterName: !Ref EnvironmentName
+
+    ECSAutoScalingGroup:
+        Type: AWS::AutoScaling::AutoScalingGroup
+        Properties:
+            VPCZoneIdentifier:
+                - !Ref PrivateSubnet1
+                - !Ref PrivateSubnet2
+            LaunchConfigurationName: !Ref ECSLaunchConfiguration
+            MinSize: !Ref ClusterSize
+            MaxSize: !Ref ClusterSize
+            DesiredCapacity: !Ref ClusterSize
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} ECS host
+                  PropagateAtLaunch: true
+        CreationPolicy:
+            ResourceSignal:
+                Timeout: PT15M
+        UpdatePolicy:
+            AutoScalingRollingUpdate:
+                MinInstancesInService: 1
+                MaxBatchSize: 1
+                PauseTime: PT15M
+                SuspendProcesses:
+                    - HealthCheck
+                    - ReplaceUnhealthy
+                    - AZRebalance
+                    - AlarmNotification
+                    - ScheduledActions
+                WaitOnResourceSignals: true
+
+    ECSLaunchConfiguration:
+        Type: AWS::AutoScaling::LaunchConfiguration
+        Properties:
+            ImageId:  !FindInMap [AWSRegionToAMI, !Ref "AWS::Region", AMI]
+            InstanceType: !Ref InstanceType
+            SecurityGroups:
+                - !Ref ECSHostSecurityGroup
+            IamInstanceProfile: !Ref ECSInstanceProfile
+            UserData:
+                "Fn::Base64": !Sub |
+                    #!/bin/bash
+                    yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+                    yum install -y aws-cfn-bootstrap hibagent
+                    /opt/aws/bin/cfn-init -v --region ${AWS::Region} --stack ${AWS::StackName} --resource ECSLaunchConfiguration
+                    /opt/aws/bin/cfn-signal -e $? --region ${AWS::Region} --stack ${AWS::StackName} --resource ECSAutoScalingGroup
+                    /usr/bin/enable-ec2-spot-hibernation
+
+        Metadata:
+            AWS::CloudFormation::Init:
+                config:
+                    packages:
+                        yum:
+                            awslogs: []
+
+                    commands:
+                        01_add_instance_to_cluster:
+                            command: !Sub echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+                    files:
+                        "/etc/cfn/cfn-hup.conf":
+                            mode: 000400
+                            owner: root
+                            group: root
+                            content: !Sub |
+                                [main]
+                                stack=${AWS::StackId}
+                                region=${AWS::Region}
+                        "/etc/cfn/hooks.d/cfn-auto-reloader.conf":
+                            content: !Sub |
+                                [cfn-auto-reloader-hook]
+                                triggers=post.update
+                                path=Resources.ECSLaunchConfiguration.Metadata.AWS::CloudFormation::Init
+                                action=/opt/aws/bin/cfn-init -v --region ${AWS::Region} --stack ${AWS::StackName} --resource ECSLaunchConfiguration
+                        "/etc/awslogs/awscli.conf":
+                            content: !Sub |
+                                [plugins]
+                                cwlogs = cwlogs
+                                [default]
+                                region = ${AWS::Region}
+                        "/etc/awslogs/awslogs.conf":
+                            content: !Sub |
+                                [general]
+                                state_file = /var/lib/awslogs/agent-state
+                                [/var/log/dmesg]
+                                file = /var/log/dmesg
+                                log_group_name = ${ECSCluster}-/var/log/dmesg
+                                log_stream_name = ${ECSCluster}
+                                [/var/log/messages]
+                                file = /var/log/messages
+                                log_group_name = ${ECSCluster}-/var/log/messages
+                                log_stream_name = ${ECSCluster}
+                                datetime_format = %b %d %H:%M:%S
+                                [/var/log/docker]
+                                file = /var/log/docker
+                                log_group_name = ${ECSCluster}-/var/log/docker
+                                log_stream_name = ${ECSCluster}
+                                datetime_format = %Y-%m-%dT%H:%M:%S.%f
+                                [/var/log/ecs/ecs-init.log]
+                                file = /var/log/ecs/ecs-init.log.*
+                                log_group_name = ${ECSCluster}-/var/log/ecs/ecs-init.log
+                                log_stream_name = ${ECSCluster}
+                                datetime_format = %Y-%m-%dT%H:%M:%SZ
+                                [/var/log/ecs/ecs-agent.log]
+                                file = /var/log/ecs/ecs-agent.log.*
+                                log_group_name = ${ECSCluster}-/var/log/ecs/ecs-agent.log
+                                log_stream_name = ${ECSCluster}
+                                datetime_format = %Y-%m-%dT%H:%M:%SZ
+                                [/var/log/ecs/audit.log]
+                                file = /var/log/ecs/audit.log.*
+                                log_group_name = ${ECSCluster}-/var/log/ecs/audit.log
+                                log_stream_name = ${ECSCluster}
+                                datetime_format = %Y-%m-%dT%H:%M:%SZ
+                    services:
+                        sysvinit:
+                            cfn-hup:
+                                enabled: true
+                                ensureRunning: true
+                                files:
+                                    - /etc/cfn/cfn-hup.conf
+                                    - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+                            awslogs:
+                                enabled: true
+                                ensureRunning: true
+                                files:
+                                    - /etc/awslogs/awslogs.conf
+                                    - /etc/awslogs/awscli.conf
+
+    # This IAM Role is attached to all of the ECS hosts. It is based on the default role
+    # published here:
+    # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html
+    #
+    # You can add other IAM policy statements here to allow access from your ECS hosts
+    # to other AWS services. Please note that this role will be used by ALL containers
+    # running on the ECS host.
+
+    ECSRole:
+        Type: AWS::IAM::Role
+        Properties:
+            Path: /
+            RoleName: !Sub ${EnvironmentName}-ECSRole-${AWS::Region}
+            AssumeRolePolicyDocument: |
+                {
+                    "Statement": [{
+                        "Action": "sts:AssumeRole",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "ec2.amazonaws.com"
+                        }
+                    }]
+                }
+            Policies:
+                - PolicyName: ecs-service
+                  PolicyDocument: |
+                    {
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": [
+                                "ecs:CreateCluster",
+                                "ecs:DeregisterContainerInstance",
+                                "ecs:DiscoverPollEndpoint",
+                                "ecs:Poll",
+                                "ecs:RegisterContainerInstance",
+                                "ecs:StartTelemetrySession",
+                                "ecs:Submit*",
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents",
+                                "ecr:BatchCheckLayerAvailability",
+                                "ecr:BatchGetImage",
+                                "ecr:GetDownloadUrlForLayer",
+                                "ecr:GetAuthorizationToken",
+                                "ssm:DescribeAssociation",
+                                "ssm:GetDeployablePatchSnapshotForInstance",
+                                "ssm:GetDocument",
+                                "ssm:GetManifest",
+                                "ssm:GetParameters",
+                                "ssm:ListAssociations",
+                                "ssm:ListInstanceAssociations",
+                                "ssm:PutInventory",
+                                "ssm:PutComplianceItems",
+                                "ssm:PutConfigurePackageResult",
+                                "ssm:UpdateAssociationStatus",
+                                "ssm:UpdateInstanceAssociationStatus",
+                                "ssm:UpdateInstanceInformation",
+                                "ec2messages:AcknowledgeMessage",
+                                "ec2messages:DeleteMessage",
+                                "ec2messages:FailMessage",
+                                "ec2messages:GetEndpoint",
+                                "ec2messages:GetMessages",
+                                "ec2messages:SendReply",
+                                "cloudwatch:PutMetricData",
+                                "ec2:DescribeInstanceStatus",
+                                "ds:CreateComputer",
+                                "ds:DescribeDirectories",
+                                "logs:CreateLogGroup",
+                                "logs:CreateLogStream",
+                                "logs:DescribeLogGroups",
+                                "logs:DescribeLogStreams",
+                                "logs:PutLogEvents",
+                                "s3:PutObject",
+                                "s3:GetObject",
+                                "s3:AbortMultipartUpload",
+                                "s3:ListMultipartUploadParts",
+                                "s3:ListBucket",
+                                "s3:ListBucketMultipartUploads"
+                            ],
+                            "Resource": "*"
+                        }]
+                    }
+
+    ECSInstanceProfile:
+            Type: AWS::IAM::InstanceProfile
+            Properties:
+                Path: /
+                Roles:
+                    - !Ref ECSRole
+
+    ECSServiceAutoScalingRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    Action:
+                    - 'sts:AssumeRole'
+                    Effect: Allow
+                    Principal:
+                        Service:
+                        - application-autoscaling.amazonaws.com
+            Path: /
+            Policies:
+                - PolicyName: ecs-service-autoscaling
+                  PolicyDocument:
+                    Statement:
+                        Effect: Allow
+                        Action:
+                        - application-autoscaling:*
+                        - cloudwatch:DescribeAlarms
+                        - cloudwatch:PutMetricAlarm
+                        - ecs:DescribeServices
+                        - ecs:UpdateService
+                        Resource: "*"
+
+    #############################################################################
+    # IAM Roles - for use with Task Definition taskRoleArn values
+    #############################################################################
+
+    PhotoStorageServiceRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - ecs-tasks.amazonaws.com
+              Action:
+                - sts:AssumeRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+    WebClientServiceRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - ecs-tasks.amazonaws.com
+              Action:
+                - sts:AssumeRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+
+Outputs:
+
+    pubIpAddress1:
+        Description: Bastion Host IP
+        Value: !GetAtt BastionInstance.PublicIp
+
+    VPC:
+        Description: A reference to the created VPC
+        Value: !Ref VPC
+
+    PublicSubnets:
+        Description: A list of the public subnets
+        Value: !Join [ ",", [ !Ref PublicSubnet1, !Ref PublicSubnet2 ]]
+
+    PrivateSubnets:
+        Description: A list of the private subnets
+        Value: !Join [ ",", [ !Ref PrivateSubnet1, !Ref PrivateSubnet2 ]]
+
+    PublicSubnet1:
+        Description: A reference to the public subnet in the 1st Availability Zone
+        Value: !Ref PublicSubnet1
+
+    PublicSubnet2:
+        Description: A reference to the public subnet in the 2nd Availability Zone
+        Value: !Ref PublicSubnet2
+
+    PrivateSubnet1:
+        Description: A reference to the private subnet in the 1st Availability Zone
+        Value: !Ref PrivateSubnet1
+
+    PrivateSubnet2:
+        Description: A reference to the private subnet in the 2nd Availability Zone
+        Value: !Ref PrivateSubnet2
+
+    ECSHostSecurityGroup:
+        Description: A reference to the security group for ECS hosts
+        Value: !Ref ECSHostSecurityGroup
+
+    LoadBalancer:
+        Description: A reference to the Application Load Balancer
+        Value: !Ref LoadBalancer
+
+    LoadBalancerUrl:
+        Description: The URL of the ALB
+        Value: !GetAtt LoadBalancer.DNSName
+
+    Listener:
+        Description: A reference to a port 80 listener
+        Value: !Ref LoadBalancerListener
+
+    LoadBalancerSecurityGroup:
+        Description: A reference to the security group for load balancers
+        Value: !Ref LoadBalancerSecurityGroup
+
+    Cluster:
+        Description: A reference to the ECS cluster
+        Value: !Ref ECSCluster
+
+    ECSServiceAutoScalingRole:
+        Description: A reference to ECS service auto scaling role
+        Value: !GetAtt ECSServiceAutoScalingRole.Arn
+
+    ECSAutoScalingGroupName:
+        Description: A reference to ECS AutoScaling Group Name
+        Value: !Ref ECSAutoScalingGroup
+
+    PhotoStorageServiceRoleArn:
+      Description: Photo Storage Service Role taskRoleArn
+      Value: !GetAtt PhotoStorageServiceRole.Arn
+
+    WebClientServiceRoleArn:
+      Description: Web Client Service Role taskRoleArn
+      Value: !GetAtt WebClientServiceRole.Arn
