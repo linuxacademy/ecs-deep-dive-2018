@@ -46,14 +46,6 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func greyscale(w http.ResponseWriter, r *http.Request) {
-
-	// Save a copy of this request for debugging.
-	// requestDump, err := httputil.DumpRequest(r, true)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(string(requestDump))
-
 	const MaxMemory = 20 * 1024 * 1024 // 20MB
 
 	defer r.Body.Close()
