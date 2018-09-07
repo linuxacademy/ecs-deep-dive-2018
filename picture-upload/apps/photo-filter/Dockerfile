@@ -1,12 +1,36 @@
-FROM node:6
+# This is a multi-stage build.
 
-# Deps
-RUN apt-get update && apt-get install -y ca-certificates git-core ssh
+# build stage
+FROM golang:1.11 AS builder
+WORKDIR /go/src/github.com/linuxacademy/photo-filter
+COPY main.go .
+RUN go get -d -v
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
-# Our source
-RUN mkdir /app
-WORKDIR /app
-ADD . /app
+# final stage
+FROM scratch
+WORKDIR /root/
+COPY --from=builder /go/src/github.com/linuxacademy/photo-filter/app .
 
-# Install node deps for each app
-RUN npm install --quiet
+# Metadata params
+ARG VERSION
+ARG BUILD_DATE
+ARG VCS_URL
+ARG VCS_REF
+ARG NAME
+ARG VENDOR
+
+# Metadata
+LABEL org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.name=$NAME \
+      org.label-schema.description="photo-filter web app" \
+      org.label-schema.url="https://linuxacademy.com" \
+      org.label-schema.vcs-url=https://github.com/linuxacademy/$VCS_URL \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vendor=$VENDOR \
+      org.label-schema.version=$VERSION \
+      org.label-schema.docker.schema-version="1.0" \
+      org.label-schema.docker.cmd="docker run --rm -p 8080:80 photo-filter"
+
+CMD ["./app"]
+EXPOSE 3002

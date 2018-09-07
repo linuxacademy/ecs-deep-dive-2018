@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "A microservice to upload and get images from Amazon S3",
   "main": "server.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CloudAssessments/s3photoapp.git"
-  },
   "scripts": {
     "clean": "rm -rf coverage .nyc_output node_modules",
     "dev": "STAGE=dev nodemon server.js",
@@ -21,7 +17,6 @@
     "aws",
     "s3"
   ],
-  "author": "jonathan lee <jonl@linuxacademy.com>",
   "license": "Apache-2.0",
   "dependencies": {
     "aws-sdk": "^2.88.0",

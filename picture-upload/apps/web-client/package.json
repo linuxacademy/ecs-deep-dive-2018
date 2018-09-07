@@ -2,10 +2,6 @@
   "name": "web-client",
   "version": "0.0.0",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CloudAssessments/s3photoapp.git"
-  },
   "scripts": {
     "clean": "rm -rf coverage .nyc_output node_modules",
     "dev": "STORAGE_PORT=3001 FILTER_PORT=3002 nodemon ./bin/www",

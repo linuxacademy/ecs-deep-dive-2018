@@ -21,15 +21,15 @@ test:
 build:
 	docker-compose build
 
-tag: build
-	docker tag s3photoapp-photo-filter:latest ${ECR_REPO_PREFIX}/s3photoapp-photo-filter:latest
-	docker tag s3photoapp-photo-storage:latest ${ECR_REPO_PREFIX}/s3photoapp-photo-storage:latest
-	docker tag s3photoapp-web-client:latest ${ECR_REPO_PREFIX}/s3photoapp-web-client:latest
+tag:
+	docker tag photo-filter:latest ${ECR_REPO_PREFIX}/photo-filter:latest
+	docker tag photo-storage:latest ${ECR_REPO_PREFIX}/photo-storage:latest
+	docker tag web-client:latest ${ECR_REPO_PREFIX}/web-client:latest
 
-push: tag
-	docker push ${ECR_REPO_PREFIX}/s3photoapp-photo-filter:latest
-	docker push ${ECR_REPO_PREFIX}/s3photoapp-photo-storage:latest
-	docker push ${ECR_REPO_PREFIX}/s3photoapp-web-client:latest
+push:
+	docker push ${ECR_REPO_PREFIX}/photo-filter:latest
+	docker push ${ECR_REPO_PREFIX}/photo-storage:latest
+	docker push ${ECR_REPO_PREFIX}/web-client:latest
 
 clean-images:
 	docker images -q -f "dangling=true" | xargs -I {} docker rmi {}
