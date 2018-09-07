@@ -1,9 +1,9 @@
 {
   "family": "web-client",
   "requiresCompatibilities": [
-    "FARGATE"
+    "EC2"
   ],
-  "networkMode": "awsvpc",
+  "networkMode": "bridge",
   "containerDefinitions": [
     {
       "name": "web-client",
@@ -13,7 +13,7 @@
       "essential": true,
       "portMappings": [
         {
-          "hostPort": "3000",
+          "hostPort": "0",
           "containerPort": "3000",
           "protocol": "tcp"
         }
@@ -38,11 +38,11 @@
   "environment": [
     {
       "name": "FILTER_HOST",
-      "value": "s3photoapp-photo-filter-service.local"
+      "value": "photo-filter-service.local"
     },
     {
       "name": "STORAGE_HOST",
-      "value": "s3photoapp-photo-storage-service.local"
+      "value": "photo-storage-service.local"
     },
     {
       "name": "DEBUG",

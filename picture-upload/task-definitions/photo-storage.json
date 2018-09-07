@@ -1,9 +1,9 @@
 {
   "family": "photo-storage",
   "requiresCompatibilities": [
-    "FARGATE"
+    "EC2"
   ],
-  "networkMode": "awsvpc",
+  "networkMode": "bridge",
   "containerDefinitions": [
     {
       "name": "photo-storage",
@@ -13,7 +13,7 @@
       "essential": true,
       "portMappings": [
         {
-          "hostPort": "3001",
+          "hostPort": "0",
           "containerPort": "3001",
           "protocol": "tcp"
         }

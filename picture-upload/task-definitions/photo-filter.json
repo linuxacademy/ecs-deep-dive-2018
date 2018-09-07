@@ -1,9 +1,9 @@
 {
   "family": "photo-filter",
   "requiresCompatibilities": [
-    "FARGATE"
+    "EC2"
   ],
-  "networkMode": "awsvpc",
+  "networkMode": "bridge",
   "containerDefinitions": [
     {
       "name": "photo-filter",
@@ -13,7 +13,7 @@
       "essential": true,
       "portMappings": [
         {
-          "hostPort": "3002",
+          "hostPort": "0",
           "containerPort": "3002",
           "protocol": "tcp"
         }
@@ -28,19 +28,8 @@
       }
     }
   ],
-  "command": [
-    "npm",
-    "run",
-    "prod"
-  ],
   "memory": "512",
   "cpu": "256",
-  "environment": [
-    {
-      "name": "DEBUG",
-      "value": "*"
-    }
-  ],
   "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
   "volumes": [],
   "placementConstraints": []
