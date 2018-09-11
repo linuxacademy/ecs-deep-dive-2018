@@ -31,4 +31,4 @@ push:
 clean-images:
 	docker images -q -f "dangling=true" | xargs -I {} docker rmi {}
 
-.PHONY: clean install lint test build tag push clean inspect
+.PHONY: clean install lint test build tag push clean
