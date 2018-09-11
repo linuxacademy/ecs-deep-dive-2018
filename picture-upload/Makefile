@@ -1,6 +1,6 @@
 clean:
 	cd apps/photo-storage && npm run clean;
-	cd apps/photo-filter && rm photo-filter;
+	cd apps/photo-filter && ([ -e photo-filter ] && rm photo-filter);
 	cd apps/web-client && npm run clean;
 
 install:
