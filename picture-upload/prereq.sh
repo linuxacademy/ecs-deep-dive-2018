@@ -11,7 +11,7 @@ sudo yum update -y
 sudo yum install -y docker git
 
 # Install additional development tools, i.e. gcc, make, etc.
-sudo yum groupinstall 'Development Tools'
+sudo yum groupinstall -y 'Development Tools'
 
 # Start the Docker service
 sudo service docker start
