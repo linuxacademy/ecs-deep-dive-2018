@@ -30,7 +30,6 @@ services:
     image: photo-filter:latest
     ports:
       - "3002:3002"
-    #entrypoint: npm run prod
     environment:
       PORT:
 
