@@ -31,8 +31,11 @@ nvm install 6
 
 # Install Go 1.11
 wget https://dl.google.com/go/go1.11.linux-amd64.tar.gz
-tar xvf go.11.linux-amd64.tar.gz
+tar xvf go1.11.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go
 sudo mv go /usr/local
+rm -rf go
+rm -f go1.11.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
 
