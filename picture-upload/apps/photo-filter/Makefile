@@ -13,7 +13,7 @@ build:
 	--build-arg VENDOR="${VENDOR}" .
 
 run:
-	docker run --rm -p 3002:3002 ${IMAGE}
+	docker run --rm -p 3002:3002 --name photo-filter ${IMAGE}
 
 tag:
 	docker tag ${IMAGE}:latest ${ECR_REPO_PREFIX}/${IMAGE}:latest

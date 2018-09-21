@@ -5,15 +5,9 @@
       "name": "stress",
       "image": "000000000000.dkr.ecr.us-east-1.amazonaws.com/stress:latest",
       "memoryReservation": "300",
-      "cpu": "256",
+      "cpu": null,
       "essential": true,
-      "portMappings": [
-        {
-          "hostPort": "0",
-          "containerPort": "80",
-          "protocol": "tcp"
-        }
-      ],
+      "portMappings": [],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {

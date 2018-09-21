@@ -11,6 +11,10 @@ This project is composed of independent Node.js services:
 - photo-filter: a REST API for applying filters to a given image
 - photo-storage: a REST API for creating, reading, and deleting images in Amazon S3
 
+## Prerequisites
+
+All prerequisite tools can be installed using the [prereq.sh](prereq.sh) script provided
+
 ## Development Installation
 
 1. Requires [Node.js 6+](https://nodejs.org) and [Go 1.11+](https://golang.org).

@@ -1,16 +1,15 @@
 # This is a multi-stage build.
+# It will generate an image ~7.8MB in size with 1 layer.
 
 # build stage
 FROM golang:1.11 AS builder
-WORKDIR /go/src/github.com/linuxacademy/photo-filter
-COPY main.go .
-RUN go get -d -v
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
+WORKDIR /app/
+COPY . .
+RUN CGO_ENABLED=0 go build -o app .
 
 # final stage
 FROM scratch
-WORKDIR /root/
-COPY --from=builder /go/src/github.com/linuxacademy/photo-filter/app .
+COPY --from=builder /app .
 
 # Metadata params
 ARG VERSION
