@@ -11,7 +11,7 @@ Description: >
     Finally, it deploys a pair of example ECS services from containers published in
     Amazon EC2 Container Registry (Amazon ECR).
 
-    Last Modified: 2018-08-09
+    Last Modified: 2018-09-21
     Author: Mark Richman <mark@linuxacademy.com>
 
 Resources:
@@ -19,19 +19,19 @@ Resources:
     VPC:
         Type: AWS::CloudFormation::Stack
         Properties:
-            TemplateURL: https://raw.githubusercontent.com/linuxacademy/ecs-deep-dive-2018/master/cloudformation/vpc.yaml
+            TemplateURL: https://s3.amazonaws.com/ecs-deep-dive-2018/cloudformation/vpc.yaml
             Parameters:
                 EnvironmentName:    !Ref AWS::StackName
-                VpcCIDR:            10.180.0.0/16
-                PublicSubnet1CIDR:  10.180.8.0/21
-                PublicSubnet2CIDR:  10.180.16.0/21
-                PrivateSubnet1CIDR: 10.180.24.0/21
-                PrivateSubnet2CIDR: 10.180.32.0/21
+                VpcCIDR:            10.0.0.0/16
+                PublicSubnet1CIDR:  10.0.8.0/21
+                PublicSubnet2CIDR:  10.0.16.0/21
+                PrivateSubnet1CIDR: 10.0.24.0/21
+                PrivateSubnet2CIDR: 10.0.32.0/21
 
     SecurityGroups:
         Type: AWS::CloudFormation::Stack
         Properties:
-            TemplateURL: https://raw.githubusercontent.com/linuxacademy/ecs-deep-dive-2018/master/cloudformation/security-groups.yaml
+            TemplateURL: https://s3.amazonaws.com/ecs-deep-dive-2018/cloudformation/security-groups.yaml
             Parameters:
                 EnvironmentName: !Ref AWS::StackName
                 VPC: !GetAtt VPC.Outputs.VPC
@@ -39,7 +39,7 @@ Resources:
     ALB:
         Type: AWS::CloudFormation::Stack
         Properties:
-            TemplateURL: https://raw.githubusercontent.com/linuxacademy/ecs-deep-dive-2018/master/cloudformation/load-balancers.yaml
+            TemplateURL: https://s3.amazonaws.com/ecs-deep-dive-2018/cloudformation/load-balancers.yaml
             Parameters:
                 EnvironmentName: !Ref AWS::StackName
                 VPC: !GetAtt VPC.Outputs.VPC
@@ -49,53 +49,25 @@ Resources:
     ECS:
         Type: AWS::CloudFormation::Stack
         Properties:
-            TemplateURL: https://raw.githubusercontent.com/linuxacademy/ecs-deep-dive-2018/master/cloudformation/ecs-cluster.yaml
+            TemplateURL: https://s3.amazonaws.com/ecs-deep-dive-2018/cloudformation/ecs-cluster.yaml
             Parameters:
                 EnvironmentName: !Ref AWS::StackName
-                InstanceType: t2.large
+                InstanceType: t2.micro
                 ClusterSize: 4
                 VPC: !GetAtt VPC.Outputs.VPC
                 SecurityGroup: !GetAtt SecurityGroups.Outputs.ECSHostSecurityGroup
                 Subnets: !GetAtt VPC.Outputs.PrivateSubnets
 
-    ProductService:
+    LifecycleHook:
         Type: AWS::CloudFormation::Stack
         Properties:
-            TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/services/product-service/service.yaml
+            TemplateURL: https://s3.amazonaws.com/ecs-deep-dive-2018/cloudformation/lifecyclehook.yaml
             Parameters:
-                VPC: !GetAtt VPC.Outputs.VPC
                 Cluster: !GetAtt ECS.Outputs.Cluster
-                DesiredCount: 2
-                Listener: !GetAtt ALB.Outputs.Listener
-                Path: /products
-
-    WebsiteService:
-        Type: AWS::CloudFormation::Stack
-        Properties:
-            TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/services/website-service/service.yaml
-            Parameters:
-                VPC: !GetAtt VPC.Outputs.VPC
-                Cluster: !GetAtt ECS.Outputs.Cluster
-                DesiredCount: 2
-                ProductServiceUrl: !Join [ "/", [ !GetAtt ALB.Outputs.LoadBalancerUrl, "products" ]]
-                Listener: !GetAtt ALB.Outputs.Listener
-                Path: /
-                ECSServiceAutoScalingRoleARN: !GetAtt ECS.Outputs.ECSServiceAutoScalingRole
-
-    # LifecycleHook:
-    #     Type: AWS::CloudFormation::Stack
-    #     Properties:
-    #         TemplateURL: https://raw.githubusercontent.com/linuxacademy/ecs-deep-dive-2018/master/cloudformation/lifecyclehook.yaml
-    #         Parameters:
-    #             Cluster: !GetAtt ECS.Outputs.Cluster
-    #             ECSAutoScalingGroupName: !GetAtt ECS.Outputs.ECSAutoScalingGroupName
+                ECSAutoScalingGroupName: !GetAtt ECS.Outputs.ECSAutoScalingGroupName
 
 Outputs:
 
-    ProductServiceUrl:
-        Description: The URL endpoint for the product service
-        Value: !Join [ "/", [ !GetAtt ALB.Outputs.LoadBalancerUrl, "products" ]]
-
-    WebsiteServiceUrl:
-        Description: The URL endpoint for the website service
+    LoadBalancerUrl:
+        Description: The URL endpoint for the ALB
         Value: !Join ["", [ !GetAtt ALB.Outputs.LoadBalancerUrl, "/" ]]
