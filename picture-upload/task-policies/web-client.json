@@ -5,7 +5,9 @@
       "Effect": "Allow",
       "Action": [
         "dynamodb:createTable",
-        "dynamodb:describeTable"
+        "dynamodb:describeTable",
+        "dynamodb:getItem",
+        "dynamodb:putItem"
       ],
       "Resource": "*"
     }

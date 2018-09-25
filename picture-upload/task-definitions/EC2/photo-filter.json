@@ -1,9 +1,9 @@
 {
   "family": "photo-filter",
   "requiresCompatibilities": [
-    "EC2"
+    "EC2","FARGATE"
   ],
-  "networkMode": "bridge",
+  "networkMode": "awsvpc",
   "containerDefinitions": [
     {
       "name": "photo-filter",
