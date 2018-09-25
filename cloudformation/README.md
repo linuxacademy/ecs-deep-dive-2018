@@ -35,4 +35,4 @@ Using the AWS CLI, execute the following command:
 
 `aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --template-body file://master.yaml --stack-name mystackname`
 
-Where `mystackname` is the desired name of your stack.
+Where `mystackname` is the desired name of your stack (i.e. "Production")

@@ -1,0 +1,46 @@
+{
+  "family": "web-client",
+  "requiresCompatibilities": [
+      "EC2"
+  ],
+  "networkMode": "bridge",
+  "containerDefinitions": [
+      {
+          "name": "web-client",
+          "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/web-client:latest",
+          "essential": true,
+          "portMappings": [
+              {
+                  "hostPort": 0,
+                  "containerPort": 3000,
+                  "protocol": "tcp"
+              }
+          ],
+          "command": [
+              "npm",
+              "run",
+              "prod"
+          ],
+          "environment": [
+              {
+                  "name": "DEBUG",
+                  "value": "*"
+              }
+          ],
+          "logConfiguration": {
+              "logDriver": "awslogs",
+              "options": {
+                  "awslogs-group": "/ecs/web-client",
+                  "awslogs-region": "us-east-1",
+                  "awslogs-stream-prefix": "ecs"
+              }
+          }
+      }
+  ],
+  "memory": "512",
+  "cpu": "256",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/WebClientTaskRole",
+  "volumes": [],
+  "placementConstraints": []
+}

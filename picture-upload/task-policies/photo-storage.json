@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:createBucket",
+        "s3:deleteObject",
+        "s3:getSignedUrl",
+        "s3:headObject",
+        "s3:listObjectsV2",
+        "s3:upload"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

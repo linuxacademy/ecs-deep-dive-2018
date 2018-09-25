@@ -1,0 +1,20 @@
+{
+  "cluster": "Production",
+  "serviceName": "web-client",
+  "taskDefinition": "web-client",
+  "desiredCount": 1,
+  "serviceRegistries": [
+    {
+      "registryArn": "arn:aws:servicediscovery:us-east-1:123456789012:service/srv-utcrh6wavdkggqtk"
+    }
+  ],
+  "launchType": "EC2",
+  "platformVersion": "LATEST",
+  "loadBalancers": [
+    {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/ProductionECSCluster-default/1234567890123456",
+      "containerName": "web-client",
+      "containerPort": 3000
+    }
+  ]
+}

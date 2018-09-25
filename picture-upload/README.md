@@ -1,4 +1,3 @@
-
 # Picture Upload
 
 A multi-project repo of services that work together to form a demo to enable users to get and upload photos to Amazon S3.
@@ -81,3 +80,84 @@ All prerequisite tools can be installed using the [prereq.sh](prereq.sh) script 
 - `AWS_REGION`:
   - Default: "us-east-1"
   - Description: The region to send AWS S3 Requests to
+
+## Deploy to ECS Cluster
+
+There are EC2 and Fargate versions for the Service and Task definition JSON files.
+
+### Create Task Roles
+
+Perform the following commands:
+
+```sh
+aws iam create-role --role-name PhotoStorageTaskRole --assume-role-policy-document file://assume-role.json
+aws iam create-role --role-name WebClientTaskRole --assume-role-policy-document file://assume-role.json
+```
+
+### Attach Task Policies
+
+For each of the task policies in the `task-policies` directory, perform the following commands:
+
+```sh
+aws iam put-role-policy --role-name PhotoStorageTaskRole --policy-name PhotoStorageTaskPolicy --policy-document file://photo-storage.json
+aws iam put-role-policy --role-name WebClientTaskRole --policy-name WebClientTaskPolicy --policy-document file://web-client.json
+```
+
+### Register Task Definitions
+
+For each of the task definitions in the `task-definitions` directory, edit the JSON files, making the following changes:
+
+1. Replace `123456789012` in `image`, `executionRoleArn`, and `taskRoleArn` with your 12-digit account ID.
+1. Change the region from `us-east-1`, if desired.
+
+Then perform the following commands:
+
+```sh
+aws ecs register-task-definition --cli-input-json file://photo-filter.json
+aws ecs register-task-definition --cli-input-json file://photo-storage.json
+aws ecs register-task-definition --cli-input-json file://web-client.json
+```
+
+### Create Services
+
+For each of the service definitions in the `service-definitions` directory, edit the JSON files, making the following changes:
+
+1. Set `clusterName` to your cluster.
+1. Replace `123456789012` in `registryArn` with your 12-digit account ID. Change the region from `us-east-1`, if desired.
+1. Set `targetGroupArn` to the ARN of your load balancer's target group.
+
+Then perform the following commands:
+
+```sh
+aws ecs create-service --cli-input-json file://photo-filter.json
+aws ecs create-service --cli-input-json file://photo-storage.json
+aws ecs create-service --cli-input-json file://web-client.json
+```
+
+### Verify Service Discovery
+
+```sh
+aws servicediscovery list-services
+aws servicediscovery list-instances --service-id <service_id>
+aws route53 list-resource-record-sets --hosted-zone-id <hosted_zone_id>
+```
+
+### Clean Up
+
+Delete the policies, roles, services, and task definitions:
+
+```sh
+aws iam delete-role-policy --role-name PhotoStorageTaskRole --policy-name PhotoStorageTaskPolicy
+aws iam delete-role-policy --role-name WebClientTaskRole --policy-name WebClientTaskPolicy
+
+aws iam delete-role --role-name PhotoStorageTaskRole
+aws iam delete-role --role-name WebClientTaskRole
+
+aws ecs delete-service --service photo-filter --cluster production-cluster
+aws ecs delete-service --service photo-storage --cluster production-cluster
+aws ecs delete-service --service web-client --cluster production-cluster
+
+aws ecs deregister-task-definition --task-definition photo-filter:1
+aws ecs deregister-task-definition --task-definition photo-storage:1
+aws ecs deregister-task-definition --task-definition web-client:1
+```

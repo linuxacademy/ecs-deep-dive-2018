@@ -265,6 +265,32 @@ Resources:
             Roles:
                 - !Ref ECSRole
 
+    SSMRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                - Effect: "Allow"
+                  Principal:
+                    Service:
+                    - "ssm.amazonaws.com"
+                    - "ec2.amazonaws.com"
+                  Action: "sts:AssumeRole"
+            ManagedPolicyArns:
+            - "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
+            Path: "/"
+            Policies:
+            - PolicyName: "passrole"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                - Effect: "Allow"
+                  Action:
+                  - "iam:PassRole"
+                  Resource:
+                  - !GetAtt ECSRole.Arn
+
     ECSServiceAutoScalingRole:
         Type: AWS::IAM::Role
         Properties:
