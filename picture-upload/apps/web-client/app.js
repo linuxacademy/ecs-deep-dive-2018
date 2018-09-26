@@ -17,8 +17,17 @@ const express = require('express');
 const logger = require('morgan');
 const multer = require('multer')();
 const path = require('path');
-const request = require('request');
+
 const { v4: uuid } = require('uuid');
+
+const Request = require('request');
+const ServiceAgent = require('service-agent');
+
+var request = Request.defaults({
+  agentClass: ServiceAgent,
+  agentOptions: { service: '' },
+  pool: {}
+});
 
 const app = express();
 const debugAppVars = debug('APP_VARS');
