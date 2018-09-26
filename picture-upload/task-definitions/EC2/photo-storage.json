@@ -1,10 +1,11 @@
 {
     "family": "photo-storage",
     "requiresCompatibilities": [
-        "EC2",
-        "FARGATE"
+        "EC2"
     ],
-    "networkMode": "awsvpc",
+    "memory": "512",
+    "cpu": "256",
+    "taskRoleArn": "arn:aws:iam::123456789012:role/PhotoStorageTaskRole",
     "containerDefinitions": [
         {
             "name": "photo-storage",
@@ -12,9 +13,7 @@
             "essential": true,
             "portMappings": [
                 {
-                    "hostPort": 0,
-                    "containerPort": 3001,
-                    "protocol": "tcp"
+                    "containerPort": 3001
                 }
             ],
             "command": [
@@ -31,17 +30,11 @@
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/photo-storage",
+                    "awslogs-group": "production-service-photo-storage",
                     "awslogs-region": "us-east-1",
-                    "awslogs-stream-prefix": "ecs"
+                    "awslogs-stream-prefix": "photo-storage"
                 }
             }
         }
-    ],
-    "memory": "512",
-    "cpu": "256",
-    "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
-    "taskRoleArn": "arn:aws:iam::123456789012:role/PhotoStorageTaskRole",
-    "volumes": [],
-    "placementConstraints": []
+    ]
 }

@@ -1,9 +1,10 @@
 {
   "family": "photo-filter",
   "requiresCompatibilities": [
-    "EC2","FARGATE"
+    "EC2"
   ],
-  "networkMode": "awsvpc",
+  "memory": "512",
+  "cpu": "256",
   "containerDefinitions": [
     {
       "name": "photo-filter",
@@ -11,24 +12,17 @@
       "essential": true,
       "portMappings": [
         {
-          "hostPort": 0,
-          "containerPort": 3002,
-          "protocol": "tcp"
+          "containerPort": 3002
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/photo-filter",
+          "awslogs-group": "production-service-photo-filter",
           "awslogs-region": "us-east-1",
-          "awslogs-stream-prefix": "ecs"
+          "awslogs-stream-prefix": "photo-filter"
         }
       }
     }
-  ],
-  "memory": "512",
-  "cpu": "256",
-  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
-  "volumes": [],
-  "placementConstraints": []
+  ]
 }
