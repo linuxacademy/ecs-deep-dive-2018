@@ -66,6 +66,14 @@ app.locals = {
   table: 's3-photos-bucket-id',
 };
 
+if(filterPort == 0) {
+  app.locals.filterApiUrl = `http://${filterHost}`;
+}
+
+if(storagePort == 0) {
+  app.locals.photoApiUrl = `http://${storageHost}`;
+}
+
 debugAppVars('APP_LOCALS: ', {
   filterApiUrl: app.locals.filterApiUrl,
   photoApiUrl: app.locals.photoApiUrl,

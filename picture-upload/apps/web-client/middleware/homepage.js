@@ -64,6 +64,7 @@ module.exports = (req, res) => {
         });
       }
 
+
       if (response.statusCode === 200 && bodyJson && bodyJson.photos) {
         return renderHomepage({ urls: bodyJson.photos });
       }
@@ -71,6 +72,11 @@ module.exports = (req, res) => {
       if (response.statusCode === 404) {
         return renderHomepage({ urls: null });
       }
+
+      debugError('INVALID PHOTOS REQUEST STATUS: ', {
+        statusCode: response.statusCode,
+        body
+      });
 
       return renderHomepage({ err: body });
     }
