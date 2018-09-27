@@ -22,6 +22,10 @@
             ],
             "environment": [
                 {
+                    "name": "DEBUG",
+                    "value": "*"
+                },
+                {
                     "name": "PORT",
                     "value": "80"
                 },
@@ -39,7 +43,7 @@
                 "options": {
                     "awslogs-group": "production-service-web-client",
                     "awslogs-region": "us-east-1",
-                    "awslogs-stream-prefix": "ecs"
+                    "awslogs-stream-prefix": "web-client"
                 }
             }
         }
