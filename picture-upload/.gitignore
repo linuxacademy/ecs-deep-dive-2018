@@ -11,4 +11,4 @@ coverage
 
 .vscode/**
 
-.history
+target/**
