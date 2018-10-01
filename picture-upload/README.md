@@ -107,7 +107,7 @@ aws iam put-role-policy --role-name WebClientTaskRole --policy-name WebClientTas
 
 For each of the task definitions in the `task-definitions` directory, edit the JSON files, making the following changes:
 
-1. Replace `123456789012` in `image`, `executionRoleArn`, and `taskRoleArn` with your 12-digit account ID.
+1. Replace `YOUR_ACCOUNT_ID_HERE` in `image`, `executionRoleArn`, and `taskRoleArn` with your 12-digit account ID.
 1. Change the region from `us-east-1`, if desired.
 
 Then perform the following commands:
@@ -123,7 +123,7 @@ aws ecs register-task-definition --cli-input-json file://web-client.json
 For each of the service definitions in the `service-definitions` directory, edit the JSON files, making the following changes:
 
 1. Set `clusterName` to your cluster.
-1. Replace `123456789012` in `registryArn` with your 12-digit account ID. Change the region from `us-east-1`, if desired.
+1. Replace `YOUR_ACCOUNT_ID_HERE` in `registryArn` with your 12-digit account ID. Change the region from `us-east-1`, if desired.
 1. Set `targetGroupArn` to the ARN of your load balancer's target group.
 
 Then perform the following commands:

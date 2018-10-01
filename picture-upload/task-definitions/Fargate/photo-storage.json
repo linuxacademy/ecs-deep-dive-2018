@@ -1,0 +1,41 @@
+{
+  "family": "photo-storage",
+  "requiresCompatibilities": [
+      "FARGATE"
+  ],
+  "memory": "512",
+  "cpu": "256",
+  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID_HERE:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID_HERE:role/PhotoStorageTaskRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+      {
+          "name": "photo-storage",
+          "image": "YOUR_ACCOUNT_ID_HERE.dkr.ecr.us-east-1.amazonaws.com/photo-storage:latest",
+          "portMappings": [
+              {
+                  "containerPort": 3001
+              }
+          ],
+          "command": [
+              "npm",
+              "run",
+              "prod"
+          ],
+          "environment": [
+              {
+                  "name": "DEBUG",
+                  "value": "*"
+              }
+          ],
+          "logConfiguration": {
+              "logDriver": "awslogs",
+              "options": {
+                  "awslogs-group": "production-service-photo-storage",
+                  "awslogs-region": "us-east-1",
+                  "awslogs-stream-prefix": "photo-storage"
+              }
+          }
+      }
+  ]
+}

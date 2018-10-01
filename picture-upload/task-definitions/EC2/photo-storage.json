@@ -5,11 +5,11 @@
     ],
     "memory": "512",
     "cpu": "256",
-    "taskRoleArn": "arn:aws:iam::123456789012:role/PhotoStorageTaskRole",
+    "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID_HERE:role/PhotoStorageTaskRole",
     "containerDefinitions": [
         {
             "name": "photo-storage",
-            "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/photo-storage:latest",
+            "image": "YOUR_ACCOUNT_ID_HERE.dkr.ecr.us-east-1.amazonaws.com/photo-storage:latest",
             "portMappings": [
                 {
                     "containerPort": 3001

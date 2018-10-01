@@ -5,11 +5,11 @@
     ],
     "memory": "512",
     "cpu": "256",
-    "taskRoleArn": "arn:aws:iam::123456789012:role/WebClientTaskRole",
+    "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID_HERE:role/WebClientTaskRole",
     "containerDefinitions": [
         {
             "name": "web-client",
-            "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/web-client:latest",
+            "image": "YOUR_ACCOUNT_ID_HERE.dkr.ecr.us-east-1.amazonaws.com/web-client:latest",
             "portMappings": [
                 {
                     "containerPort": 80
@@ -36,6 +36,14 @@
                 {
                     "name": "STORAGE_HOST",
                     "value": "photo-storage.local"
+                },
+                {
+                    "name": "FILTER_PORT",
+                    "value": "0"
+                },
+                {
+                    "name": "STORAGE_PORT",
+                    "value": "0"
                 }
             ],
             "logConfiguration": {

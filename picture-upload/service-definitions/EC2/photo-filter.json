@@ -5,14 +5,14 @@
   "desiredCount": 1,
   "serviceRegistries": [
     {
-      "registryArn": "arn:aws:servicediscovery:us-east-1:123456789012:service/srv-utcrh6wavdkggqtk"
+      "registryArn": "arn:aws:servicediscovery:us-east-1:YOUR_ACCOUNT_ID_HERE:service/srv-utcrh6wavdkggqtk"
     }
   ],
   "launchType": "EC2",
   "platformVersion": "LATEST",
   "loadBalancers": [
     {
-      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/ProductionECSCluster-default/1234567890123456",
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:YOUR_ACCOUNT_ID_HERE:targetgroup/ProductionECSCluster-default/YOUR_ACCOUNT_ID_HERE3456",
       "containerName": "photo-filter",
       "containerPort": 3002
     }

@@ -1,0 +1,53 @@
+{
+  "family": "web-client",
+  "requiresCompatibilities": [
+      "FARGATE"
+  ],
+  "memory": "512",
+  "cpu": "256",
+  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID_HERE:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID_HERE:role/WebClientTaskRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+      {
+          "name": "web-client",
+          "image": "YOUR_ACCOUNT_ID_HERE.dkr.ecr.us-east-1.amazonaws.com/web-client:latest",
+          "portMappings": [
+              {
+                  "containerPort": 80
+              }
+          ],
+          "command": [
+              "npm",
+              "run",
+              "prod"
+          ],
+          "environment": [
+              {
+                  "name": "DEBUG",
+                  "value": "*"
+              },
+              {
+                  "name": "PORT",
+                  "value": "80"
+              },
+              {
+                  "name": "FILTER_HOST",
+                  "value": "photo-filter.local"
+              },
+              {
+                  "name": "STORAGE_HOST",
+                  "value": "photo-storage.local"
+              }
+          ],
+          "logConfiguration": {
+              "logDriver": "awslogs",
+              "options": {
+                  "awslogs-group": "production-service-web-client",
+                  "awslogs-region": "us-east-1",
+                  "awslogs-stream-prefix": "web-client"
+              }
+          }
+      }
+  ]
+}
