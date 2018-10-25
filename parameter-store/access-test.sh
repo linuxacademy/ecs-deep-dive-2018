@@ -29,7 +29,7 @@ mkdir -p /usr/share/nginx/html/;
 fi
 chmod 755 /usr/share/nginx/html/
 
-# Creating an HTML file to be accessed at http://<public-instance-DNS-name>/ecs.html
+# Creating an HTML file to be accessed at http://<Container-Instance-Public-IP>/ecs.html
 cat > /usr/share/nginx/html/ecs.html <<EOF
 <!DOCTYPE html>
 <html>

@@ -42,3 +42,7 @@ This will run the task definition `access-test` created in the previous step. Re
 After the task is in a running state, check the public IP of the container instance and navigate to the following page:
 
 `http://<Container-Instance-Public-IP>/ecs.html`
+
+Only the first command with the `--no-with-decryption` parameter should work. The policy allows access to the parameter in Parameter Store but there’s no access to the KMS key.
+
+The second command should fail with an access denied error.
