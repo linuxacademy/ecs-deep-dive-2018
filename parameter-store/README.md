@@ -17,7 +17,7 @@ aws iam attach-role-policy --role-name prod-app1 --policy-arn "arn:aws:iam::$AWS
 
 Upload `access-test.sh` to an S3 bucket in your account. Create a new bucket, or use an existing one.
 
-Make sure the object is publicly accessible and note down the object link, for example `https://https://s3.amazonaws.com/my-new-bucket/access-test.sh`
+Make sure the object is publicly accessible and note down the object link, for example `https://s3.amazonaws.com/my-new-bucket/access-test.sh`
 
 ## Step 4: Create ECS Cluster
 
