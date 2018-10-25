@@ -81,10 +81,6 @@ Metadata:
           - GitHubBranch
           - GitHubUser
           - GitHubToken
-      - Label:
-          default: Stack Configuration
-        Parameters:
-          - TemplateBucket
 
 Conditions:
   EC2: !Equals [ !Ref LaunchType, "EC2" ]
@@ -408,7 +404,7 @@ Resources:
       ExecutionRoleArn: !Ref TaskExecutionRole
       ContainerDefinitions:
         - Name: simple-app
-          Image: amazon/amazon-ecs-sample
+          Image: linuxacademy/ecs-deep-dive:simple-app
           EntryPoint:
             - /usr/sbin/apache2
             - -D

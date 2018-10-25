@@ -11,8 +11,8 @@ Deployment steps:
     1. Select `repo` scope
     1. Click *Generate token*
     1. Make sure to copy your new personal access token now. You won’t be able to see it again!
-1. Fork https://github.com/linuxacademy/ecs-demo-php-simple-app
-1. `git clone https://github.com/<your_github_username>/ecs-demo-php-simple-app`
+1. Fork https://github.com/linuxacademy/ecs-demo-php-simple-app into your own Github account.
+1. Clone your fork locally: `git clone https://github.com/<your_github_username>/ecs-demo-php-simple-app`
 1. Deploy CloudFormation template (`cf.yaml`).
     1. Use `us-east-1` if you would like Fargate capability.
     1. Use the Github access token generated in Step 1.
