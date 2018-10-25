@@ -23,6 +23,8 @@ Make sure the object is publicly accessible and note down the object link, for e
 
 Create a CloudFormation stack using `cf.yml`.
 
+Example: `aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name ParameterStore --template-body file://cf.yml`
+
 ## Step 5: Register Task Definition
 
 Be sure to set values for `ACCOUNT_ID` and `S3_URI` in `create-taskdef.sh` before running this script.
