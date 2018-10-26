@@ -16,10 +16,10 @@ LICENSE_CODE_KEY=$(aws kms create-key --description license-code --region $AWS_R
 aws kms create-alias --alias-name alias/license-code --target-key-id "$LICENSE_CODE_KEY" --region $AWS_REGION
 
 echo "Creating SSM Parameter: 'prod.app1.db-pass'"
-aws ssm put-parameter --name prod.app1.db-pass --value "AAAAAAAAAAA" --type SecureString --key-id "$PROD_APP1_KEY" --region $AWS_REGION --overwrite
+aws ssm put-parameter --name prod.app1.db-pass --value "P@ssw0rd1" --type SecureString --key-id "$PROD_APP1_KEY" --region $AWS_REGION --overwrite
 
 echo "Creating SSM Parameter: 'prod.app2.user-name'"
-aws ssm put-parameter --name prod.app2.user-name --value "BBBBBBBBBBB" --type String --region $AWS_REGION --overwrite
+aws ssm put-parameter --name prod.app2.user-name --value "johnsmith" --type String --region $AWS_REGION --overwrite
 
 echo "Creating SSM Parameter: 'general.license-code'"
-aws ssm put-parameter --name general.license-code --value "CCCCCCCCCCC" --type SecureString --key-id "$LICENSE_CODE_KEY" --region $AWS_REGION --overwrite
+aws ssm put-parameter --name general.license-code --value "xJee2HesQy0" --type SecureString --key-id "$LICENSE_CODE_KEY" --region $AWS_REGION --overwrite
