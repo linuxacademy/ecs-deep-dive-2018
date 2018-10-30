@@ -1,0 +1,22 @@
+{
+  "Records": [
+      {
+          "EventSource": "aws:sns",
+          "EventVersion": "1.0",
+          "EventSubscriptionArn": "arn:aws:sns:us-east-2:123456789012:Production-LifecycleHook-1HE3QVALUMFM7-NotificationTopic-11GOGUT6Q3GRF:aa6aeba8-fb5c-4eeb-8025-37ff3053d885",
+          "Sns": {
+              "Type": "Notification",
+              "MessageId": "22a478d5-96a9-5e2b-9de0-2c872e2a1839",
+              "TopicArn": "arn:aws:sns:us-east-2:123456789012:Production-LifecycleHook-1HE3QVALUMFM7-NotificationTopic-11GOGUT6Q3GRF",
+              "Subject": "Auto Scaling:  Lifecycle action 'TERMINATING' for instance i-0feb3355c5ec997a2 in progress.",
+              "Message": "{\"LifecycleHookName\":\"Production-LifecycleHook-1HE3QVALUMFM7-InstanceTerminatingHook-OPQCEWNLXAKR\",\"AccountId\":\"123456789012\",\"RequestId\":\"26759b1a-1fc9-a56a-34d9-749d5a5a2721\",\"LifecycleTransition\":\"autoscaling:EC2_INSTANCE_TERMINATING\",\"AutoScalingGroupName\":\"Production-ECS-1IZ4ZBPH2DXJS-ECSAutoScalingGroup-AZFR1SPVZPKV\",\"Service\":\"AWS Auto Scaling\",\"Time\":\"2018-10-30T19:51:31.191Z\",\"EC2InstanceId\":\"i-0feb3355c5ec997a2\",\"LifecycleActionToken\":\"aa24fc1b-1f41-433b-a6b3-b2092223e3f9\"}",
+              "Timestamp": "2018-10-30T19:51:31.217Z",
+              "SignatureVersion": "1",
+              "Signature": "TuddKRNTw2b0S4vxhTLi10RPvzIrc67b62T33llcWjmQK4N448hK3BLLKxRaWwDZLU7iSA9yuCrD25DPOH4iYIoTVeQebT9/N/1aNuHLoaoqwu7r/9sJ6GTYYbfsurI+A1JZfNzflFlNG7W8hySEEeZxLXlpX1GtPmis2OaMMCWNPx3+fSOjkuZ3MpTINkKqV+sHoHQ0MbgaGhNZwDQ9rCTbPWOUE3Ium6vxVNpS/ikUO3DuiwOMkGLuebImMDHkIQMFf8Ch2iRckBFLYWH+nHaah6VFka7WlizVkdmApQ0tU4aUqwb22jKXV42EdKGT4kKm2zqe6zM6f93MebsG/Q==",
+              "SigningCertUrl": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+              "UnsubscribeUrl": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:123456789012:Production-LifecycleHook-1HE3QVALUMFM7-NotificationTopic-11GOGUT6Q3GRF:aa6aeba8-fb5c-4eeb-8025-37ff3053d885",
+              "MessageAttributes": {}
+          }
+      }
+  ]
+}
