@@ -6,29 +6,31 @@
 # Make sure the object is publicly accessible and note down the object link,
 # for example https://s3-us-east-1.amazonaws.com/my-new-bucket/access-test.sh
 
-# Install the AWS CLI
+echo "Installing the AWS CLI"
 apt-get -y install python2.7 curl
 curl -O https://bootstrap.pypa.io/get-pip.py
 python2.7 get-pip.py
 pip install awscli
 
-# Get Region
+echo "Getting AWS Region"
 EC2_AVAIL_ZONE=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
 EC2_REGION="`echo \"$EC2_AVAIL_ZONE\" | sed -e 's:\([0-9][0-9]*\)[a-z]*\$:\\1:'`"
 
-# Retrieve parameters from Parameter Store
+echo "Retrieving parameters from Parameter Store"
 APP1_WITH_ENCRYPTION=`aws ssm get-parameters --names prod.app1.db-pass --with-decryption --region $EC2_REGION --output text 2>&1`
 APP1_WITHOUT_ENCRYPTION=`aws ssm get-parameters --names prod.app1.db-pass --no-with-decryption --region $EC2_REGION --output text 2>&1`
 LICENSE_WITH_ENCRYPTION=`aws ssm get-parameters --names general.license-code --with-decryption --region $EC2_REGION --output text 2>&1`
 LICENSE_WITHOUT_ENCRYPTION=`aws ssm get-parameters --names general.license-code --no-with-decryption --region $EC2_REGION --output text 2>&1`
 APP2_WITHOUT_ENCRYPTION=`aws ssm get-parameters --names prod.app2.user-name --no-with-decryption --region $EC2_REGION --output text 2>&1`
 
+echo "Preparing nginx folder /usr/share/nginx/html/"
 # The nginx server is started after the script is invoked, preparing folder for HTML.
 if [ ! -d /usr/share/nginx/html/ ]; then
 mkdir -p /usr/share/nginx/html/;
 fi
 chmod 755 /usr/share/nginx/html/
 
+echo "Creating /usr/share/nginx/html/ecs.html"
 # Creating an HTML file to be accessed at http://<Container-Instance-Public-IP>/ecs.html
 cat > /usr/share/nginx/html/ecs.html <<EOF
 <!DOCTYPE html>
@@ -75,3 +77,5 @@ result {background: hsl(69, 77%, 90%);}
 </body>
 </html>
 EOF
+
+cat /usr/share/nginx/html/ecs.html
