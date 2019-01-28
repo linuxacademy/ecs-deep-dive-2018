@@ -12,7 +12,9 @@ This project is composed of independent Node.js services:
 
 ## Prerequisites
 
-All prerequisite tools can be installed using the [prereq.sh](prereq.sh) script provided
+All prerequisite tools can be installed using the [prereq.sh](prereq.sh) script provided.
+
+**Note**, To install on Amazon Linux 2, follow the steps in the next section.
 
 ## Development Installation
 
