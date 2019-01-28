@@ -20,6 +20,53 @@ All prerequisite tools can be installed using the [prereq.sh](prereq.sh) script 
 1. Clone the repository into your local machine
 1. Go into the new folder `picture-upload` folder and run `make install` to install all the packages for each app.
 
+*To install on Amazon Linux 2*:
+
+```sh
+sudo yum update
+
+sudo yum install docker
+
+sudo service docker start
+sudo usermod -a -G docker $USER
+
+# log out and back in
+
+# set up Node.js https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html
+
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.0/install.sh | bash
+
+. ~/.nvm/nvm.sh
+
+nvm install 6
+
+node -e "console.log('Running Node.js ' + process.version)"
+
+sudo amazon-linux-extras install golang1.11
+
+go version
+
+git clone https://github.com/linuxacademy/ecs-deep-dive-2018
+
+cd ecs-deep-dive-2018/picture-upload/
+
+make install
+
+# You will see some warnings about `SKIPPING OPTIONAL DEPENDENCY` and deprecated modules. These can be safely ignored.
+
+# Install docker-compose
+
+sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+# make sure you're in ~/ecs-deep-dive-2018/picture-upload
+
+# edit docker-compose.yml, setting the AWS_ACCESS_KEY_ID, AWS_REGION, and AWS_SECRET_ACCESS_KEY values 
+
+docker-compose up
+```
+
 ## Development Deployment
 
 ### Using your local machine
