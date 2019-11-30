@@ -13,3 +13,4 @@ This repo contains course material organized as follows:
 `/stress`: A web application to stress the CPU, useful for demonstrating autoscaling
 
 `/task-definitions`: Various task definitions used throughout the course.
+ updated readme
