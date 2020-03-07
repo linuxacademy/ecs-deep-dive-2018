@@ -18,10 +18,10 @@ run:
 	docker run --rm -p 8080:80 ${VENDOR}/${IMAGE}
 
 tag:
-	docker tag ${VENDOR}/${IMAGE}:latest ${ECR_REPO_PREFIX}/product:latest
+	docker tag ${VENDOR}/${IMAGE}:latest ${ECR_REPO}:latest
 
 push:
-	docker push ${ECR_REPO_PREFIX}/product:latest
+	docker push ${ECR_REPO}:latest
 
 clean:
 	docker images -q -f "dangling=true" | xargs -I {} docker rmi {}
